@@ -41,6 +41,11 @@
       font-size: 18px;
       color: #808080; /* 灰色 */
       margin-top: 20px;
+      text-decoration: none; /* 防止下划线出现 */
+    }
+
+    .subtitle a {
+      color: #808080; /* 灰色 */
     }
 
     /* 动态效果 */
@@ -132,19 +137,37 @@
           meteor.classList.add("meteor");
 
           function setRandomProperties() {
-            const x = Math.random() * window.innerWidth;
-            const y = Math.random() * window.innerHeight;
-            meteor.style.left = x + "px";
-            meteor.style.top = y + "px";
+            let overlapping = true;
 
-            const size = Math.random() * (3 - 1) + 1;
+            while (overlapping) {
+              const x = Math.random() * window.innerWidth;
+              const y = Math.random() * window.innerHeight;
+
+              // Check for overlapping with existing meteors
+              overlapping = Array.from(document.querySelectorAll('.meteor')).some(existingMeteor => {
+                const rect = existingMeteor.getBoundingClientRect();
+                return (
+                  x < rect.right &&
+                  x + meteor.offsetWidth > rect.left &&
+                  y < rect.bottom &&
+                  y + meteor.offsetHeight > rect.top
+                );
+              });
+
+              if (!overlapping) {
+                meteor.style.left = x + "px";
+                meteor.style.top = y + "px";
+              }
+            }
+
+            const size = Math.random() * (5 - 3) + 1;
             meteor.style.width = size + "px";
             meteor.style.height = size + "px";
 
             const opacity = Math.random();
             meteor.style.opacity = opacity;
 
-            const duration = Math.random() * (10 - 3) + 3; // 随机持续时间在3到10秒之间
+            const duration = Math.random() * (10 - 3) + 3;
             meteor.style.animationDuration = `${duration}s`;
           }
 
@@ -154,17 +177,21 @@
           meteor.addEventListener("animationiteration", () => {
             setRandomProperties();
           });
+
+          meteor.addEventListener("animationend", () => {
+            meteor.remove();
+          });
         }
 
         // 一开始生成一些流星
-        for (let i = 1; i <= 50; i++) {
+        for (let i = 1; i <= 10; i++) {
           createRandomMeteor();
         }
 
         // 每隔一段时间生成新的流星
         setInterval(() => {
           createRandomMeteor();
-        }, 3000); // 每两秒生成一个新的流星
+        }, 1000); // 每两秒生成一个新的流星
       });
     </script>
   </div>
@@ -173,7 +200,7 @@
     <div class="title">
       <span>C</span>ra<span>z</span>y.<span>M</span>a<span>k</span>er
     </div>
-    <div class="subtitle">qyu@live.com</div>
+    <div class="subtitle"><script>document.write('<a href="mailto:qyu@live.com">qyu@live.com</a>');</script></div>
   </div>
 
   <div class="cursor-trail"></div>
